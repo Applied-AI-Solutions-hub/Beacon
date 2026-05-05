@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="Try Beacon, the Applied AI Solutions public AI workflow assistant." />
+  <title>Beacon | Applied AI Solutions</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="mark">A</div>
+        <span>Applied AI Solutions</span>
+      </div>
+      <a class="contact" href="mailto:info@appliedai.solutions?subject=Free%20AI%20Audit%20Request">Contact</a>
+    </header>
+
+    <main id="main" class="main landing">
+      <section id="hero" class="hero">
+        <div class="logoGlow"><div class="logoMark">A</div></div>
+        <h1>What can we build for you?</h1>
+        <p>Try Beacon, a live AI workflow assistant from Applied AI Solutions.</p>
+        <form id="composerHero" class="composer heroComposer">
+          <textarea id="heroInput" rows="1" placeholder="Ask Beacon what AI could build for your business…"></textarea>
+          <button type="submit" aria-label="Send">↑</button>
+        </form>
+        <div class="chips">
+          <button>Automate my customer intake</button>
+          <button>Build me an internal dashboard</button>
+          <button>Turn paperwork into a workflow</button>
+          <button>Show me what an AI agent can do</button>
+        </div>
+        <p class="safety">Public demo mode. No private data or system access.</p>
+      </section>
+
+      <section id="thread" class="thread" aria-live="polite"></section>
+    </main>
+
+    <div id="toolDock" class="toolDock hidden">
+      <button id="searchTool" type="button">Web search</button>
+      <label class="uploadBtn">Parse PDF<input id="pdfInput" type="file" accept="application/pdf" hidden /></label>
+      <span id="remaining" class="remaining"></span>
+    </div>
+
+    <form id="composerBottom" class="composer bottomComposer hidden">
+      <textarea id="bottomInput" rows="1" placeholder="Message Beacon…"></textarea>
+      <button type="submit" aria-label="Send">↑</button>
+    </form>
+
+    <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modalCard">
+        <button id="closeModal" class="x" aria-label="Close">×</button>
+        <h2 id="modalTitle">Ready to build this around your business?</h2>
+        <p>Beacon is only a short public demo. Request a Free AI Audit and Applied AI Solutions can map one real workflow from your business.</p>
+        <form id="leadForm" class="leadForm">
+          <input name="name" placeholder="Your name" />
+          <input name="businessName" placeholder="Business name" />
+          <input name="email" type="email" placeholder="Email *" required />
+          <input name="phone" placeholder="Phone (optional)" />
+          <textarea name="challenge" placeholder="Biggest workflow/admin problem" rows="3"></textarea>
+          <button type="submit">Request Free AI Audit</button>
+        </form>
+        <p id="leadThanks" class="thanks hidden">Thanks — your request was received. Applied AI Solutions will review it and follow up.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="/script.js" type="module"></script>
+</body>
+</html>
