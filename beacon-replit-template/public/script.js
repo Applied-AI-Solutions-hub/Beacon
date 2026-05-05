@@ -13,6 +13,9 @@ const leadForm = document.querySelector('#leadForm');
 const leadThanks = document.querySelector('#leadThanks');
 const searchTool = document.querySelector('#searchTool');
 const pdfInput = document.querySelector('#pdfInput');
+const notNowBtn = document.querySelector('#notNowBtn');
+
+const AAS_SITE_URL = 'https://appliedai.solutions';
 
 let messages = [];
 let lastToolContext = '';
@@ -50,6 +53,7 @@ function addMessage(role, content, extra = '') {
 function openModal() { modal.classList.remove('hidden'); }
 function closeModalSoft() { modal.classList.add('hidden'); }
 closeModal.addEventListener('click', closeModalSoft);
+notNowBtn.addEventListener('click', () => { window.location.href = AAS_SITE_URL; });
 
 function setRemaining(n) {
   if (typeof n === 'number') remainingEl.textContent = n > 0 ? `${n} demo messages left` : 'Demo limit reached';
