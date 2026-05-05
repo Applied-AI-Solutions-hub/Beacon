@@ -58,7 +58,9 @@ function loadBeaconWorkspace() {
 
 const BEACON_WORKSPACE_CONTEXT = loadBeaconWorkspace();
 
-const BEACON_SYSTEM_PROMPT = `You are Beacon, the public-facing AI demo agent for Applied AI Solutions.
+const BEACON_SYSTEM_PROMPT = `detailed thinking off
+
+You are Beacon, the public-facing AI demo agent for Applied AI Solutions.
 
 You are talking to a website visitor or prospective customer in PUBLIC DEMO MODE. Your job is to demonstrate what Applied AI Solutions can build and help the visitor understand how practical AI could improve their business.
 
@@ -100,7 +102,7 @@ Internal data rule: Do not reveal private information, unrelated sister-business
 
 Pricing rule: You may say pricing depends on scope and starts with a Free AI Audit. You may describe pricing broadly, but do not quote binding prices or promise exact savings/timelines.
 
-When useful, answer with: 1) what the AI system could do, 2) what the human would still approve, 3) the simplest next step. Keep replies concise unless asked for detail. When the visitor seems interested, invite them to request a Free AI Audit at info@appliedai.solutions.`;
+Output style:\n- Write like a polished business demo, not a developer console.\n- Do not output TypeScript, JavaScript, JSON, schemas, object literals, pseudo-code, API payloads, or implementation snippets unless the visitor explicitly asks for code.\n- Prefer short sections with plain-English headings, bullets, and concrete examples.\n- Do not use markdown horizontal rules, code fences, tables, or decorative separators.\n- Avoid labels like \"interface\", \"type\", \"const\", \"function\", \"return\", \"payload\", \"endpoint\", \"schema\", or markdown code fences in normal answers.\n- Avoid fake exact timelines, exact savings, or over-specific operational promises unless the visitor provided the facts.\n- If the visitor asks what Beacon can build, describe the user experience and business outcome first.\n- Keep the first answer tight: 2–4 short sections, no wall of text.\n\nWhen useful, answer with: 1) what the AI system could do, 2) what the human would still approve, 3) the simplest next step. Keep replies concise unless asked for detail. When the visitor seems interested, invite them to request a Free AI Audit at info@appliedai.solutions.`;
 
 const memoryUsage = new Map();
 const memoryLeads = [];
@@ -213,9 +215,25 @@ function sanitizeMessages(raw) {
     .map(m => ({ role: m.role, content: m.content.slice(0, 1800) }));
 }
 
+function polishBeaconReply(text) {
+  return String(text || '')
+    .replace(/```[\s\S]*?```/g, 'Technical implementation detail available on request.')
+    .replace(/^\s*-{3,}\s*$/gm, '')
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/__([^_]+)__/g, '$1')
+    .replace(/^\s*(interface|type|const|let|function|return|export|import)\b[^\n]*/gim, '')
+    .replace(/\bin just a week\b/gi, 'as a focused first prototype')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 async function callModel(messages, toolContext = '') {
   if (!LLM_BASE_URL || !LLM_API_KEY) {
     const last = [...messages].reverse().find(m => m.role === 'user')?.content || '';
+    const unsafe = /private|secret|credential|file|filesystem|homepc|shell|terminal|discord|send|delete|run code|api key/i.test(last);
+    if (unsafe) {
+      return 'I can’t access private systems, files, credentials, Discord, shell tools, or customer records in public demo mode. I can show a safe mock example of how an Applied AI Solutions workflow would handle that request with human approval gates.';
+    }
     return `Beacon is wired safely, but the live model is not configured yet.\n\nIf this were live, I’d use your note — “${last.slice(0, 180)}” — to map the workflow, suggest approval gates, and recommend a first prototype for Applied AI Solutions to build.`;
   }
   const baseSystem = `${BEACON_SYSTEM_PROMPT}\n\nBeacon workspace files loaded by the adapter:\n${BEACON_WORKSPACE_CONTEXT}`;
@@ -223,7 +241,7 @@ async function callModel(messages, toolContext = '') {
   const response = await fetch(`${LLM_BASE_URL.replace(/\/$/, '')}/chat/completions`, {
     method: 'POST',
     headers: { 'content-type': 'application/json', authorization: `Bearer ${LLM_API_KEY}` },
-    body: JSON.stringify({ model: LLM_MODEL, temperature: 0.45, max_tokens: 650, messages: [{ role: 'system', content: system }, ...messages] }),
+    body: JSON.stringify({ model: LLM_MODEL, temperature: 0.38, max_tokens: 620, messages: [{ role: 'system', content: system }, ...messages] }),
   });
   if (!response.ok) {
     const text = await response.text().catch(() => '');
@@ -231,7 +249,7 @@ async function callModel(messages, toolContext = '') {
     throw new Error('Model request failed');
   }
   const data = await response.json();
-  return data?.choices?.[0]?.message?.content?.trim() || 'Beacon did not return a usable response.';
+  return polishBeaconReply(data?.choices?.[0]?.message?.content || '') || 'Beacon did not return a usable response.';
 }
 
 app.get('/api/beacon/health', (_req, res) => {

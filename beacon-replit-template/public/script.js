@@ -31,6 +31,52 @@ function enterChat() {
 
 function scrollDown() { requestAnimationFrame(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })); }
 
+function renderBeaconText(target, content) {
+  const lines = String(content || '').replace(/```[\s\S]*?```/g, match => {
+    const body = match.replace(/```\w*\n?|```/g, '').trim();
+    if (/\b(interface|type|const|let|function|return|=>|export|import)\b/.test(body)) {
+      return 'Technical implementation detail available on request.';
+    }
+    return body;
+  }).split('\n');
+
+  let list = null;
+  const closeList = () => { list = null; };
+
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) { closeList(); continue; }
+
+    const heading = line.match(/^#{1,3}\s+(.+)$/) || line.match(/^\*\*(.+)\*\*:?$/);
+    if (heading) {
+      closeList();
+      const h = document.createElement('h3');
+      h.textContent = heading[1].replace(/:$/, '');
+      target.append(h);
+      continue;
+    }
+
+    const bullet = line.match(/^[-*•]\s+(.+)$/);
+    const numbered = line.match(/^\d+[.)]\s+(.+)$/);
+    if (bullet || numbered) {
+      const tag = numbered ? 'ol' : 'ul';
+      if (!list || list.tagName.toLowerCase() !== tag) {
+        list = document.createElement(tag);
+        target.append(list);
+      }
+      const li = document.createElement('li');
+      li.textContent = (bullet || numbered)[1];
+      list.append(li);
+      continue;
+    }
+
+    closeList();
+    const p = document.createElement('p');
+    p.textContent = line.replace(/^Beacon:\s*/i, '');
+    target.append(p);
+  }
+}
+
 function addMessage(role, content, extra = '') {
   enterChat();
   const row = document.createElement('div');
@@ -40,7 +86,8 @@ function addMessage(role, content, extra = '') {
   avatar.textContent = role === 'user' ? 'U' : 'B';
   const bubble = document.createElement('div');
   bubble.className = 'bubble';
-  bubble.textContent = content;
+  if (role === 'assistant' && !extra.includes('typing')) renderBeaconText(bubble, content);
+  else bubble.textContent = content;
   row.append(avatar, bubble);
   thread.append(row);
   scrollDown();
