@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" role="img" aria-label="Applied AI Solutions icon">
+  <defs>
+    <linearGradient id="aas-g" x1="14" x2="82" y1="12" y2="84" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#33d6ff"/>
+      <stop offset="1" stop-color="#7c5cff"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="96" height="96" rx="24" fill="#07111f"/>
+  <path d="M48 14 82 80H68l-7-15H35l-7 15H14L48 14Zm0 24-9 20h18L48 38Z" fill="url(#aas-g)" filter="url(#glow)"/>
+</svg>
