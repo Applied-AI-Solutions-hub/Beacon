@@ -5,54 +5,60 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="description" content="Try Beacon, the Applied AI Solutions public AI workflow assistant." />
   <title>Beacon | Applied AI Solutions</title>
-  <!-- Tailwind CDN for utility‑first styling -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/styles.css" />
 </head>
-<body class="bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 text-white font-sans min-h-screen flex flex-col">
-  <div class="app flex-1 flex flex-col">
-    <header class="fixed inset-x-0 top-0 z-10 flex justify-between items-center p-4 md:p-6 bg-black/70 backdrop-blur-md border-b border-white/10">
-      <div class="brand flex items-center gap-3">
-        <div class="mark w-10 h-10 flex items-center justify-center bg-gradient-to-r from-blue-500 to-cyan-400 rounded-lg shadow-lg text-2xl font-bold">A</div>
-        <span class="text-white text-lg font-medium">Applied AI Solutions</span>
+<body class="bg-gradient-to-br from-gray-900 via-indigo-900 to-slate-900 text-white font-sans min-h-screen flex flex-col">
+  <div class="flex-1 flex flex-col">
+    <!-- Header -->
+    <header class="fixed inset-x-0 top-0 z-10 flex items-center justify-between p-4 md:p-6 bg-gray-800/70 backdrop-blur-md border-b border-white/10">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 flex items-center justify-center bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg shadow-lg text-2xl font-bold">A</div>
+        <span class="text-lg font-medium">Applied AI Solutions</span>
       </div>
-      <a class="contact inline-block px-4 py-2 border border-white/20 rounded-full hover:bg-white/10" href="mailto:info@appliedai.solutions?subject=Free%20AI%20Audit%20Request">Contact</a>
+      <a href="mailto:info@appliedai.solutions?subject=Free%20AI%20Audit%20Request" class="px-4 py-2 border border-white/20 rounded-full hover:bg-white/10">Contact</a>
     </header>
 
-    <main id="main" class="mt-20 flex-1 flex items-center justify-center px-4 md:px-8">
-      <section id="hero" class="text-center space-y-6 max-w-2xl">
+    <!-- Hero -->
+    <main class="mt-20 flex-1 flex items-center justify-center px-4 md:px-8">
+      <section class="text-center space-y-6 max-w-2xl">
         <div class="mx-auto w-24 h-24 flex items-center justify-center bg-white/10 rounded-xl backdrop-blur-sm">
-          <div class="logoMark w-16 h-16 flex items-center justify-center bg-gradient-to-r from-blue-500 to-cyan-400 rounded-lg text-3xl font-bold text-white">A</div>
+          <div class="w-16 h-16 flex items-center justify-center bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg text-3xl font-bold text-white">A</div>
         </div>
         <h1 class="text-4xl md:text-5xl font-bold tracking-tight">What can we build for you?</h1>
         <p class="text-gray-300 text-lg">Try Beacon, a live AI workflow assistant from Applied AI Solutions.</p>
-        <form id="composerHero" class="composer heroComposer flex w-full max-w-xl mx-auto">
+        <form id="composerHero" class="flex w-full max-w-xl mx-auto">
           <textarea id="heroInput" rows="1" placeholder="Ask Beacon what AI could build for your business…" class="flex-1 p-3 rounded-l-full bg-white/5 text-white placeholder-gray-400 focus:outline-none"></textarea>
-          <button type="submit" aria-label="Send" class="px-4 bg-gradient-to-r from-blue-500 to-cyan-400 text-white rounded-r-full hover:opacity-90">↑</button>
+          <button type="submit" aria-label="Send" class="px-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-r-full hover:opacity-90">↑</button>
         </form>
-        <div class="chips flex flex-wrap gap-2 justify-center mt-4">
+        <div class="flex flex-wrap gap-2 justify-center mt-4">
           <button class="px-4 py-2 border border-white/20 rounded-full hover:bg-white/10">Automate my customer intake</button>
           <button class="px-4 py-2 border border-white/20 rounded-full hover:bg-white/10">Build me an internal dashboard</button>
           <button class="px-4 py-2 border border-white/20 rounded-full hover:bg-white/10">Turn paperwork into a workflow</button>
           <button class="px-4 py-2 border border-white/20 rounded-full hover:bg-white/10">Show what an AI agent can do</button>
         </div>
-        <p class="safety text-xs text-gray-400 mt-2">Public demo mode. No private data or system access.</p>
+        <p class="text-xs text-gray-400 mt-2">Public demo mode. No private data or system access.</p>
       </section>
     </main>
 
-    <div id="toolDock" class="fixed inset-x-0 bottom-24 flex justify-center gap-2 hidden md:flex">
+    <!-- Tool dock -->
+    <div class="fixed inset-x-0 bottom-24 flex justify-center gap-2 hidden md:flex">
       <button id="searchTool" class="px-4 py-2 bg-white/10 rounded-full hover:bg-white/20">Web search</button>
-      <label class="uploadBtn px-4 py-2 bg-white/10 rounded-full cursor-pointer hover:bg-white/20">Parse PDF<input id="pdfInput" type="file" accept="application/pdf" hidden /></label>
-      <span id="remaining" class="text-gray-400"></span>
+      <label class="px-4 py-2 bg-white/10 rounded-full cursor-pointer hover:bg-white/20">
+        Parse PDF<input id="pdfInput" type="file" accept="application/pdf" hidden />
+      </label>
+      <span class="text-gray-400"></span>
     </div>
 
+    <!-- Bottom composer -->
     <form id="composerBottom" class="fixed inset-x-0 bottom-4 flex justify-center hidden md:flex">
       <textarea id="bottomInput" rows="1" placeholder="Message Beacon…" class="flex-1 max-w-2xl p-3 rounded-l-full bg-white/5 text-white placeholder-gray-400 focus:outline-none"></textarea>
-      <button type="submit" aria-label="Send" class="px-4 bg-gradient-to-r from-blue-500 to-cyan-400 text-white rounded-r-full hover:opacity-90">↑</button>
+      <button type="submit" aria-label="Send" class="px-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-r-full hover:opacity-90">↑</button>
     </form>
 
-    <div id="modal" class="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm hidden">
-      <div class="modalCard bg-gray-900/90 border border-white/10 rounded-xl p-6 max-w-md w-full">
+    <!-- Modal -->
+    <div class="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm hidden" id="modal">
+      <div class="bg-gray-900/90 border border-white/10 rounded-xl p-6 max-w-md w-full">
         <button id="closeModal" class="absolute top-2 right-2 text-gray-400 hover:text-white">×</button>
         <h2 class="text-xl font-bold mb-2">Ready to build this around your business?</h2>
         <p class="text-gray-300 mb-4">Beacon is only a short public demo. Request a Free AI Audit and Applied AI Solutions can map one real workflow from your business.</p>
@@ -62,12 +68,11 @@
           <input name="email" type="email" placeholder="Email *" required class="p-2 rounded bg-white/5 text-white" />
           <input name="phone" placeholder="Phone (optional)" class="p-2 rounded bg-white/5 text-white" />
           <textarea name="challenge" placeholder="Biggest workflow/admin problem" rows="3" class="p-2 rounded bg-white/5 text-white"></textarea>
-          <button type="submit" class="w-full py-2 bg-gradient-to-r from-blue-500 to-cyan-400 rounded text-white font-semibold">Request Free AI Audit</button>
+          <button type="submit" class="w-full py-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded text-white font-semibold">Request Free AI Audit</button>
         </form>
-        <p id="leadThanks" class="thanks text-green-300 hidden mt-2">Thanks — your request was received. Applied AI Solutions will review it and follow up.</p>
+        <p id="leadThanks" class="text-green-300 hidden mt-2">Thanks — your request was received. Applied AI Solutions will review it and follow up.</p>
       </div>
     </div>
-
   </div>
   <script src="/script.js" type="module"></script>
 </body>
