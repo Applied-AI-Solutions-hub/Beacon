@@ -11,31 +11,34 @@
   <div class="app">
     <header class="topbar">
       <div class="brand">
-        <img class="mark" src="/aas-icon-dark.svg" alt="" />
+        <img src="/aas-logo-glow.svg" alt="" class="brandLogo" />
         <span>Applied AI Solutions</span>
       </div>
-      <a class="contact" href="mailto:info@appliedai.solutions?subject=Free%20AI%20Audit%20Request">Contact</a>
+      <a class="contact" href="mailto:info@appliedai.solutions?subject=Free%20AI%20Audit%20Request">Free AI Audit</a>
     </header>
 
     <main id="main" class="main landing">
       <section id="hero" class="hero">
-        <div class="logoGlow"><img class="logoMark" src="/aas-icon-dark.svg" alt="Applied AI Solutions" /></div>
-        <h1>What can we build for you?</h1>
-        <p>Try Beacon, a live AI workflow assistant from Applied AI Solutions.</p>
+        <img src="/aas-logo-glow.svg" alt="Applied AI Solutions" class="heroLogo" />
         <form id="composerHero" class="composer heroComposer">
-          <textarea id="heroInput" rows="1" placeholder="Ask Beacon what AI could build for your business…"></textarea>
+          <textarea id="heroInput" rows="1" placeholder="Tell Beacon what keeps slipping through the cracks…"></textarea>
           <button type="submit" aria-label="Send">↑</button>
         </form>
-        <div class="chips">
-          <button>Automate my customer intake</button>
-          <button>Build me an internal dashboard</button>
-          <button>Turn paperwork into a workflow</button>
-          <button>Show me what an AI agent can do</button>
-        </div>
-        <p class="safety">Public demo mode. No private data or system access.</p>
       </section>
 
       <section id="thread" class="thread" aria-live="polite"></section>
+
+      <section class="belowFold" aria-label="What Beacon can show">
+        <div>
+          <h2>Built around the way your business actually works.</h2>
+          <p>Beacon turns a messy process into a first-pass workflow: intake fields, approval gates, follow-up drafts, dashboard sections, and the simplest next step.</p>
+        </div>
+        <div class="miniGrid">
+          <article><strong>Intake</strong><span>Capture the right details before work starts.</span></article>
+          <article><strong>Approval</strong><span>Keep owners in control before messages, quotes, or payments go out.</span></article>
+          <article><strong>Knowledge</strong><span>Help the team find answers without digging through scattered docs.</span></article>
+        </div>
+      </section>
     </main>
 
     <div id="toolDock" class="toolDock hidden">
