@@ -29,22 +29,7 @@ function enterChat() {
   bottomInput.focus();
 }
 
-function scrollDown(target = null) {
-  requestAnimationFrame(() => {
-    if (target) {
-      target.scrollIntoView({ block: 'start', behavior: 'smooth' });
-      return;
-    }
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-  });
-}
-
-function createTurn() {
-  const turn = document.createElement('div');
-  turn.className = 'turn';
-  thread.append(turn);
-  return turn;
-}
+function scrollDown() { requestAnimationFrame(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })); }
 
 function renderBeaconText(target, content) {
   const lines = String(content || '').replace(/```[\s\S]*?```/g, match => {
@@ -92,7 +77,7 @@ function renderBeaconText(target, content) {
   }
 }
 
-function addMessage(role, content, extra = '', parent = thread) {
+function addMessage(role, content, extra = '') {
   enterChat();
   const row = document.createElement('div');
   row.className = `msg ${role} ${extra}`;
@@ -104,8 +89,8 @@ function addMessage(role, content, extra = '', parent = thread) {
   if (role === 'assistant' && !extra.includes('typing')) renderBeaconText(bubble, content);
   else bubble.textContent = content;
   row.append(avatar, bubble);
-  parent.append(row);
-  scrollDown(parent === thread ? row : parent);
+  thread.append(row);
+  scrollDown();
   return row;
 }
 
@@ -120,12 +105,11 @@ function setRemaining(n) {
 async function sendToBeacon(text) {
   const content = text.trim();
   if (!content || locked) return;
-  const turn = createTurn();
-  addMessage('user', content, '', turn);
+  addMessage('user', content);
   messages.push({ role: 'user', content });
   heroInput.value = bottomInput.value = '';
   autoGrow(heroInput); autoGrow(bottomInput);
-  const typing = addMessage('assistant', 'Thinking…', 'typing', turn);
+  const typing = addMessage('assistant', 'Thinking…', 'typing');
   try {
     const response = await fetch('/api/beacon', {
       method: 'POST',
@@ -135,7 +119,7 @@ async function sendToBeacon(text) {
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Beacon request failed');
     typing.remove();
-    addMessage('assistant', data.reply, '', turn);
+    addMessage('assistant', data.reply);
     messages.push({ role: 'assistant', content: data.reply });
     setRemaining(data.remaining);
     lastToolContext = '';
@@ -146,7 +130,7 @@ async function sendToBeacon(text) {
     }
   } catch (err) {
     typing.remove();
-    addMessage('assistant', `Beacon hit an issue: ${err.message}`, '', turn);
+    addMessage('assistant', `Beacon hit an issue: ${err.message}`);
   }
 }
 
@@ -158,10 +142,9 @@ document.querySelectorAll('.chips button').forEach(btn => btn.addEventListener('
 searchTool.addEventListener('click', async () => {
   const q = prompt('What should Beacon research on the public web?');
   if (!q) return;
-  const turn = createTurn();
-  addMessage('user', `Search the web for: ${q}`, '', turn);
+  addMessage('user', `Search the web for: ${q}`);
   messages.push({ role: 'user', content: `Search the web for: ${q}` });
-  const typing = addMessage('assistant', 'Searching public web…', 'typing', turn);
+  const typing = addMessage('assistant', 'Searching public web…', 'typing');
   try {
     const r = await fetch('/api/tools/web-search', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ query: q }) });
     const data = await r.json();
@@ -171,7 +154,7 @@ searchTool.addEventListener('click', async () => {
     await sendToBeacon(`Use the public web search results to answer this and cite useful sources: ${q}`);
   } catch (err) {
     typing.remove();
-    addMessage('assistant', `Search issue: ${err.message}`, '', turn);
+    addMessage('assistant', `Search issue: ${err.message}`);
   }
 });
 
@@ -180,9 +163,8 @@ pdfInput.addEventListener('change', async () => {
   if (!file) return;
   if (!confirm('Public demo mode: do not upload private customer, financial, medical, legal, or confidential files. Continue?')) { pdfInput.value=''; return; }
   enterChat();
-  const turn = createTurn();
-  addMessage('user', `Parse this PDF: ${file.name}`, '', turn);
-  const typing = addMessage('assistant', 'Reading PDF…', 'typing', turn);
+  addMessage('user', `Parse this PDF: ${file.name}`);
+  const typing = addMessage('assistant', 'Reading PDF…', 'typing');
   const form = new FormData();
   form.append('pdf', file);
   try {
@@ -195,7 +177,7 @@ pdfInput.addEventListener('change', async () => {
     await sendToBeacon(`Summarize the uploaded PDF and identify office workflows or automations Applied AI Solutions could build from it.`);
   } catch (err) {
     typing.remove();
-    addMessage('assistant', `PDF issue: ${err.message}`, '', turn);
+    addMessage('assistant', `PDF issue: ${err.message}`);
   } finally {
     pdfInput.value = '';
   }
