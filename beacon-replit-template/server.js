@@ -20,6 +20,17 @@ const MESSAGE_LIMIT = Number(process.env.BEACON_MESSAGE_LIMIT || 10);
 const LIMIT_WINDOW_HOURS = Number(process.env.BEACON_LIMIT_WINDOW_HOURS || 24);
 
 app.disable('x-powered-by');
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && /^https:\/\/(www\.)?appliedai\.solutions$/i.test(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  next();
+});
 app.use(express.json({ limit: '80kb' }));
 app.use(express.static(path.join(__dirname, 'public'), {
   etag: true,
@@ -227,6 +238,70 @@ function polishBeaconReply(text) {
     .trim();
 }
 
+
+function shouldSearchWeb(messages) {
+  const last = [...messages].reverse().find(m => m.role === 'user')?.content || '';
+  return /\b(near me|in my area|around me|local|nearby|current|today|latest|recent|this week|this month|where can i|who offers|requirements?|regulations?|permits?|knoxville|tennessee|tn|source|search|look up|web)\b/i.test(last);
+}
+
+function decodeHtml(value) {
+  return String(value || '')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#x27;|&#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/<[^>]+>/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+async function runPublicWebSearch(query) {
+  const clean = String(query || '').replace(/\s+/g, ' ').trim().slice(0, 180);
+  if (!clean) return { results: [] };
+  const results = [];
+
+  const instantUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(clean)}&format=json&no_redirect=1&no_html=1`;
+  const instant = await fetch(instantUrl, { headers: { 'user-agent': 'AppliedAISolutions-BeaconDemo/1.0' } });
+  if (instant.ok) {
+    const data = await instant.json();
+    if (data.AbstractText) results.push({ title: data.Heading || clean, url: data.AbstractURL || '', snippet: data.AbstractText });
+    for (const topic of data.RelatedTopics || []) {
+      if (results.length >= 3) break;
+      if (topic.Text && topic.FirstURL) results.push({ title: topic.Text.split(' - ')[0].slice(0, 90), url: topic.FirstURL, snippet: topic.Text.slice(0, 260) });
+    }
+  }
+
+  if (results.length < 3) {
+    const htmlUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(clean)}`;
+    const htmlRes = await fetch(htmlUrl, { headers: { 'user-agent': 'Mozilla/5.0 AppliedAISolutions-BeaconDemo/1.0' } });
+    if (htmlRes.ok) {
+      const html = await htmlRes.text();
+      const blocks = html.split('result__body').slice(1, 8);
+      for (const block of blocks) {
+        if (results.length >= 5) break;
+        const href = block.match(/href="([^"]+)"[^>]*class="result__a"/i) || block.match(/class="result__a"[^>]*href="([^"]+)"/i);
+        const title = block.match(/class="result__a"[^>]*>([\s\S]*?)<\/a>/i);
+        const snippet = block.match(/class="result__snippet"[^>]*>([\s\S]*?)<\/a>/i) || block.match(/class="result__snippet"[^>]*>([\s\S]*?)<\/div>/i);
+        let url = decodeHtml(href?.[1] || '');
+        try {
+          const parsed = new URL(url, 'https://duckduckgo.com');
+          if (parsed.searchParams.get('uddg')) url = parsed.searchParams.get('uddg');
+        } catch {}
+        const item = { title: decodeHtml(title?.[1] || clean), url, snippet: decodeHtml(snippet?.[1] || '') };
+        if (item.url && !results.some(r => r.url === item.url)) results.push(item);
+      }
+    }
+  }
+
+  return { results: results.slice(0, 5) };
+}
+
+function formatSearchContext(query, results) {
+  if (!results?.length) return `Public web search was requested for "${query}", but no useful public snippets came back. Say that current details should be verified and answer from general knowledge.`;
+  return `Public web search results for "${query}". Use these only as public source snippets. Cite useful links by name/URL when relevant. Do not overstate certainty.\n\n` + results.map((x, i) => `${i + 1}. ${x.title}\n${x.url}\n${x.snippet}`).join('\n\n');
+}
+
 async function callModel(messages, toolContext = '') {
   if (!LLM_BASE_URL || !LLM_API_KEY) {
     const last = [...messages].reverse().find(m => m.role === 'user')?.content || '';
@@ -266,10 +341,20 @@ app.post('/api/beacon', async (req, res) => {
     }
     const messages = sanitizeMessages(req.body?.messages);
     if (!messages.length) return res.status(400).json({ error: 'No message provided.' });
-    const reply = await callModel(messages, String(req.body?.toolContext || '').slice(0, 4000));
+    let toolContext = String(req.body?.toolContext || '').slice(0, 4000);
+    let sources = [];
+    let usedWebSearch = false;
+    if (!toolContext && shouldSearchWeb(messages)) {
+      const query = [...messages].reverse().find(m => m.role === 'user')?.content || '';
+      const search = await runPublicWebSearch(query);
+      sources = search.results || [];
+      usedWebSearch = true;
+      toolContext = formatSearchContext(query, sources).slice(0, 5000);
+    }
+    const reply = await callModel(messages, toolContext);
     await incrementUsage(visitorKey);
     const remaining = Math.max(0, MESSAGE_LIMIT - Number(usage.message_count) - 1);
-    res.json({ reply, remaining, limitReached: remaining === 0 });
+    res.json({ reply, remaining, limitReached: remaining === 0, usedWebSearch, sources });
   } catch (err) {
     console.error('Beacon route error:', err);
     res.status(500).json({ error: 'Beacon server error.' });
