@@ -241,7 +241,7 @@ function polishBeaconReply(text) {
 
 function shouldSearchWeb(messages) {
   const last = [...messages].reverse().find(m => m.role === 'user')?.content || '';
-  return /\b(near me|in my area|around me|local|nearby|current|today|latest|recent|this week|this month|where can i|who offers|requirements?|regulations?|permits?|knoxville|tennessee|tn|source|search|look up|web)\b/i.test(last);
+  return /\b(near me|in my area|around me|local|nearby|current|today|latest|recent|this week|this month|where can i|who offers|requirements?|regulations?|permits?|knoxville|tennessee|tn|source|search|look up|web|company|business|website|reviews?|competitors?|about|what do they do|who is|who are)\b/i.test(last) || /\b[A-Z][A-Za-z0-9&'.-]+(?:\s+[A-Z][A-Za-z0-9&'.-]+){1,5}\b/.test(last);
 }
 
 function decodeHtml(value) {
@@ -312,7 +312,7 @@ async function callModel(messages, toolContext = '') {
     return `Beacon is wired safely, but the live model is not configured yet.\n\nIf this were live, I’d use your note — “${last.slice(0, 180)}” — to map the workflow, suggest approval gates, and recommend a first prototype for Applied AI Solutions to build.`;
   }
   const baseSystem = `${BEACON_SYSTEM_PROMPT}\n\nBeacon workspace files loaded by the adapter:\n${BEACON_WORKSPACE_CONTEXT}`;
-  const system = toolContext ? `${baseSystem}\n\nSafe tool context from this request:\n${toolContext}` : baseSystem;
+  const system = toolContext ? `${baseSystem}\n\nSafe tool context from this request:\n${toolContext}\n\nWhen public web results are supplied for a named company, answer specifically about that company. Do not give a generic industry answer unless sources are weak or missing. Use a short Sources section at the bottom. Avoid phrases like 'provided search results' or 'tool context'.` : baseSystem;
   const response = await fetch(`${LLM_BASE_URL.replace(/\/$/, '')}/chat/completions`, {
     method: 'POST',
     headers: { 'content-type': 'application/json', authorization: `Bearer ${LLM_API_KEY}` },
