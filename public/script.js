@@ -22,6 +22,7 @@ function autoGrow(el) { el.style.height = 'auto'; el.style.height = Math.min(el.
 [heroInput, bottomInput].forEach(el => el.addEventListener('input', () => autoGrow(el)));
 
 function enterChat() {
+  charExitToCorner();
   hero.classList.add('hidden');
   main.classList.remove('landing');
   composerBottom.classList.remove('hidden');
@@ -203,3 +204,87 @@ fetch('/api/beacon/health').then(r=>r.json()).then(data => {
   setRemaining(data.limit);
   if (!data.modelConfigured) console.warn('Beacon model not configured yet. Add LLM_BASE_URL, LLM_API_KEY, LLM_MODEL.');
 }).catch(()=>{});
+
+// ===== BEACON CHARACTER INTRO =====
+const charLayer   = document.querySelector('#charLayer');
+const charBubble  = document.querySelector('#charBubble');
+const charBubbleText = document.querySelector('#charBubbleText');
+let charExited = false;
+
+const DIALOGUES = [
+  "Hey! I'm Beacon. 👋",
+  "I can show you what AI could do\nfor your business.",
+  "Type a question below, or tap one\nof the example prompts. ↓",
+];
+
+// Typewriter effect — resolves after text finishes + short hold
+function typeText(el, text, speed = 38) {
+  return new Promise(resolve => {
+    el.textContent = '';
+    // Add blinking cursor
+    const cursor = document.createElement('span');
+    cursor.className = 'char-cursor';
+    el.parentNode.insertBefore(cursor, el.nextSibling);
+    let i = 0;
+    const tick = () => {
+      if (charExited) { cursor.remove(); resolve(); return; }
+      if (i < text.length) {
+        el.textContent += text[i++];
+        setTimeout(tick, speed);
+      } else {
+        setTimeout(() => { cursor.remove(); resolve(); }, 1100);
+      }
+    };
+    tick();
+  });
+}
+
+function showBubble() { charBubble.classList.add('visible'); }
+function hideBubble()  { charBubble.classList.remove('visible'); }
+
+async function runCharacterIntro() {
+  await new Promise(r => setTimeout(r, 700));
+  if (charExited) return;
+
+  // Walk onto the screen
+  charLayer.classList.add('char-in', 'char-walking');
+  await new Promise(r => setTimeout(r, 1500));
+  if (charExited) return;
+
+  // Stop walking, switch to idle float
+  charLayer.classList.remove('char-walking');
+  charLayer.classList.add('char-idle');
+  await new Promise(r => setTimeout(r, 350));
+
+  // Run through each dialogue line
+  for (const line of DIALOGUES) {
+    if (charExited) return;
+    showBubble();
+    await typeText(charBubbleText, line, 36);
+    if (charExited) return;
+    hideBubble();
+    await new Promise(r => setTimeout(r, 400));
+  }
+
+  // Stay idle with no bubble — waiting for user to type
+}
+
+function charExitToCorner() {
+  if (charExited) return;
+  charExited = true;
+  hideBubble();
+  charLayer.classList.remove('char-idle', 'char-walking');
+
+  // Quick wave + send-off message
+  charLayer.classList.add('char-waving');
+  charBubbleText.textContent = "Let's go! 🚀";
+  showBubble();
+
+  setTimeout(() => {
+    hideBubble();
+    charLayer.classList.remove('char-waving');
+    charLayer.classList.add('char-idle', 'char-gone');
+  }, 1100);
+}
+
+runCharacterIntro();

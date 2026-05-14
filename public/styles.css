@@ -114,3 +114,153 @@ textarea::placeholder{color:var(--soft)}.composer button,.leadForm button{
   border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.055);color:var(--text);padding:.85rem .9rem;outline:none;
 }.leadForm input:focus,.leadForm textarea:focus{border-color:rgba(51,214,255,.45);box-shadow:0 0 0 3px rgba(51,214,255,.08)}.leadForm button{width:100%;margin-top:.25rem}.thanks{color:var(--green)!important}.typing{color:var(--muted)}
 @media(max-width:640px){.topbar{padding:14px}.brand span{font-size:14px}.main{padding:74px 12px 132px}.hero h1{font-size:42px}.bubble{max-width:88%;font-size:15px}.toolDock{overflow-x:auto}.remaining{display:none}.modalCard{padding:22px}}
+
+/* ===== BEACON CHARACTER INTRO ===== */
+.char-layer{
+  position:fixed;
+  bottom:clamp(140px,22vh,230px);
+  left:clamp(16px,6vw,80px);
+  z-index:3;
+  display:flex;
+  align-items:flex-end;
+  gap:16px;
+  pointer-events:none;
+  transform:translateX(calc(-100% - 140px));
+  transition:
+    transform 1.4s cubic-bezier(0.22,1,0.36,1),
+    bottom 0.85s cubic-bezier(0.22,1,0.36,1),
+    left 0.85s cubic-bezier(0.22,1,0.36,1),
+    scale 0.85s cubic-bezier(0.22,1,0.36,1);
+  transform-origin:bottom left;
+}
+.char-layer.char-in{transform:translateX(0)}
+.char-layer.char-gone{bottom:90px;left:16px;scale:0.42}
+.char-layer.char-gone .char-bubble{display:none!important}
+
+/* Bot body */
+.char-bot{display:flex;flex-direction:column;align-items:center;gap:3px}
+
+/* Antenna */
+.char-antenna{width:2px;height:13px;background:linear-gradient(to top,var(--bg-2),var(--cyan));display:flex;justify-content:center;align-items:flex-start}
+.char-dot{width:9px;height:9px;border-radius:50%;background:var(--cyan);margin-top:-5px;animation:char-dot-pulse 2s ease-in-out infinite}
+@keyframes char-dot-pulse{0%,100%{box-shadow:0 0 6px var(--cyan)}50%{box-shadow:0 0 16px var(--cyan),0 0 28px rgba(51,214,255,.45)}}
+
+/* Head */
+.char-head{
+  width:54px;height:42px;
+  background:var(--surface-strong);
+  border:1.5px solid rgba(51,214,255,.5);
+  border-radius:13px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  box-shadow:0 0 22px rgba(51,214,255,.12),inset 0 1px 0 rgba(255,255,255,.06);
+}
+.char-eyes{display:flex;gap:11px}
+.char-eye{
+  width:13px;height:13px;border-radius:50%;
+  background:var(--cyan);
+  box-shadow:0 0 8px var(--cyan),0 0 16px rgba(51,214,255,.4);
+  animation:char-eye-glow 3s ease-in-out infinite;
+}
+@keyframes char-eye-glow{0%,100%{opacity:1}50%{opacity:.55}}
+.char-mouth{width:20px;height:3px;border-radius:2px;background:rgba(51,214,255,.3)}
+
+/* Mid — arms + torso */
+.char-mid{display:flex;align-items:flex-start}
+.char-arm{
+  width:11px;height:27px;
+  background:var(--surface-strong);
+  border:1.5px solid var(--line);
+  border-radius:5px;
+  margin-top:5px;
+  transform-origin:top center;
+}
+.char-arm-l{margin-right:-1px}
+.char-arm-r{margin-left:-1px}
+.char-torso{
+  width:54px;height:38px;
+  background:var(--surface-strong);
+  border:1.5px solid var(--line);
+  border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+.char-core{
+  width:13px;height:13px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,var(--cyan),var(--blue));
+  box-shadow:0 0 10px rgba(51,214,255,.5);
+  animation:char-core-pulse 2.4s ease-in-out infinite;
+}
+@keyframes char-core-pulse{0%,100%{transform:scale(1);box-shadow:0 0 8px rgba(51,214,255,.4)}50%{transform:scale(1.2);box-shadow:0 0 18px rgba(51,214,255,.7)}}
+
+/* Legs */
+.char-legs{display:flex;gap:8px;margin-top:3px}
+.char-leg{
+  width:17px;height:21px;
+  background:var(--surface-strong);
+  border:1.5px solid var(--line);
+  border-radius:5px;
+  transform-origin:top center;
+}
+
+/* Walking */
+.char-walking .char-leg-l{animation:char-leg-l .44s ease-in-out infinite}
+.char-walking .char-leg-r{animation:char-leg-r .44s ease-in-out infinite}
+.char-walking .char-arm-l{animation:char-arm-l .44s ease-in-out infinite}
+.char-walking .char-arm-r{animation:char-arm-r .44s ease-in-out infinite}
+.char-walking .char-bot{animation:char-walk-bob .44s ease-in-out infinite}
+@keyframes char-leg-l{0%,100%{transform:rotate(-20deg)}50%{transform:rotate(20deg)}}
+@keyframes char-leg-r{0%,100%{transform:rotate(20deg)}50%{transform:rotate(-20deg)}}
+@keyframes char-arm-l{0%,100%{transform:rotate(20deg)}50%{transform:rotate(-20deg)}}
+@keyframes char-arm-r{0%,100%{transform:rotate(-20deg)}50%{transform:rotate(20deg)}}
+@keyframes char-walk-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+
+/* Idle float */
+.char-idle .char-bot{animation:char-idle-float 3.2s ease-in-out infinite}
+@keyframes char-idle-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+/* Wave */
+.char-waving .char-arm-r{animation:char-wave .38s ease-in-out 4}
+@keyframes char-wave{0%,100%{transform:rotate(-15deg)}50%{transform:rotate(-80deg)}}
+
+/* Speech bubble */
+.char-bubble{
+  max-width:245px;min-width:160px;
+  background:linear-gradient(180deg,rgba(16,33,58,.97),rgba(7,17,31,.97));
+  border:1px solid rgba(51,214,255,.32);
+  border-radius:16px;
+  padding:12px 16px;
+  margin-bottom:10px;
+  position:relative;
+  box-shadow:0 8px 30px rgba(0,0,0,.45),0 0 0 1px rgba(51,214,255,.07);
+  opacity:0;
+  transform:translateY(7px) scale(.95);
+  transition:opacity .25s ease,transform .25s ease;
+}
+.char-bubble.visible{opacity:1;transform:translateY(0) scale(1)}
+/* Triangle pointer toward character on the left */
+.char-bubble::before{
+  content:'';
+  position:absolute;
+  bottom:16px;left:-7px;
+  width:13px;height:13px;
+  background:rgba(12,26,47,.97);
+  border-left:1px solid rgba(51,214,255,.32);
+  border-bottom:1px solid rgba(51,214,255,.32);
+  transform:rotate(45deg);
+  border-radius:0 0 0 3px;
+}
+.char-bubble-text{margin:0;font-size:13px;line-height:1.55;color:var(--text)}
+.char-cursor{
+  display:inline-block;width:2px;height:13px;
+  background:var(--cyan);
+  vertical-align:middle;margin-left:1px;
+  animation:char-blink .65s step-end infinite;
+}
+@keyframes char-blink{0%,100%{opacity:1}50%{opacity:0}}
+
+@media(max-width:640px){
+  .char-layer{bottom:clamp(145px,24vh,190px);left:12px;gap:10px}
+  .char-bubble{max-width:190px}
+  .char-bubble-text{font-size:12px}
+  .char-layer.char-gone{bottom:88px;left:12px}
+}
