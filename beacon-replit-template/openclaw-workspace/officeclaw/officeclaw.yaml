@@ -1,0 +1,14 @@
+name: officeclaw-local
+version: 0.2.0
+workspace_type: openclaw.local_customer_ops
+customer_root: customers
+identity_file: identity/OFFICECLAW.md
+skill_map: skills/skill-map.yaml
+database: data/officeclaw.sqlite3
+local_model_adapter:
+  default_provider: off
+  supported_providers:
+    - ollama
+    - nim
+    - openai-compatible
+  deterministic_fallback: true

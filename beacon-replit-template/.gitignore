@@ -3,3 +3,8 @@ node_modules/
 uploads/
 *.log
 .DS_Store
+openclaw-workspace/officeclaw/data/*.sqlite3
+openclaw-workspace/officeclaw/customers/*/reports/*.html
+openclaw-workspace/officeclaw/customers/*/approvals/
+__pycache__/
+*.py[cod]

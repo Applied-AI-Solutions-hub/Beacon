@@ -1,0 +1,6 @@
+Invoice #1042
+Bill To: Johnson Home Services
+Subtotal: $1,250.00
+Amount Due: $1,250.00
+Terms: Net 30
+Please remit payment by the due date.

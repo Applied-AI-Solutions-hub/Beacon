@@ -1,0 +1,28 @@
+skills:
+  document_classification:
+    description: Classify local text documents into invoice, P&L, schedule, or unknown.
+    entrypoint: officeclaw.classifier:classify_text
+    requires_paid_api: false
+  approval_requests:
+    description: Create owner-review requests before acting on sensitive workflow steps.
+    storage: data/officeclaw.sqlite3
+    requires_paid_api: false
+  owner_reports:
+    description: Generate a local HTML briefing from ingested documents and approvals.
+    output: customers/<customer_id>/reports/
+    requires_paid_api: false
+  local_model_adapter:
+    description: Optional Ollama or NIM/OpenAI-compatible summary enrichment.
+    env:
+      - OFFICECLAW_MODEL_PROVIDER
+      - OFFICECLAW_MODEL_BASE_URL
+      - OFFICECLAW_MODEL_NAME
+      - OFFICECLAW_MODEL_API_KEY
+    fallback: deterministic_heuristics
+    requires_paid_api: false
+approval_gates:
+  - calendar_draft
+  - customer_message
+  - invoice_change
+  - payment_request
+  - record_update

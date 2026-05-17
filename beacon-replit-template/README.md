@@ -79,3 +79,19 @@ Files loaded:
 - `beacon-workspace/knowledge/aas-capabilities.md`
 
 This is the safe bridge before connecting to a private agent runtime. It gives Beacon workspace-backed behavior without exposing operator credentials publicly.
+
+## OfficeClaw local workspace seed
+
+This repository now includes an OpenClaw-style local OfficeClaw seed in `openclaw-workspace/officeclaw/`. It mirrors the local developer package workflow with deterministic document classification, approval requests, SQLite storage, owner-ready HTML reports, and an optional local model adapter for Ollama or NIM/OpenAI-compatible endpoints.
+
+Run it locally:
+
+```bash
+cd openclaw-workspace/officeclaw
+python3 scripts/officeclaw_cli.py init
+python3 scripts/officeclaw_cli.py ingest customers/demo_customer/documents
+python3 scripts/officeclaw_cli.py approval calendar_draft "Draft appointment: Johnson estimate follow-up next Tuesday at 10:30 AM."
+python3 scripts/officeclaw_cli.py report demo_customer
+```
+
+See `openclaw-workspace/officeclaw/README.md` for local model adapter settings and Ubuntu Core appliance notes.
