@@ -1,0 +1,6 @@
+Profit and Loss Summary
+Revenue: $42,800
+Cost of Goods Sold: $18,900
+Gross Margin: $23,900
+Operating Expenses: $12,300
+Net Income: $11,600
